@@ -1,12 +1,12 @@
-package me.alpha432.oyvey.features.gui;
+package me.zoux1.features.gui;
 
-import me.alpha432.oyvey.features.Feature;
-import me.alpha432.oyvey.features.gui.items.Item;
-import me.alpha432.oyvey.features.gui.items.buttons.Button;
-import me.alpha432.oyvey.features.modules.client.ClickGuiModule;
-import me.alpha432.oyvey.util.ColorUtil;
-import me.alpha432.oyvey.util.render.RenderUtil;
-import me.alpha432.oyvey.util.render.ScissorUtil;
+import me.zoux1.features.Feature;
+import me.zoux1.features.gui.items.Item;
+import me.zoux1.features.gui.items.buttons.Button;
+import me.zoux1.features.modules.client.ClickGuiModule;
+import me.zoux1.util.ColorUtil;
+import me.zoux1.util.render.RenderUtil;
+import me.zoux1.util.render.ScissorUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
@@ -15,8 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Widget
-        extends Feature {
+public class Widget extends Feature {
     protected GuiGraphics context;
     private final List<Item> items = new ArrayList<>();
     public boolean drag;
@@ -55,7 +54,7 @@ public class Widget
         if (this.open) {
             RenderUtil.rect(context, this.x, (float) this.y + 12.5f, this.x + this.width, (float) (this.y + this.height) + totalItemHeight, 0x77000000);
         }
-        drawString(this.getName(), (float) this.x + 3.0f, (float) this.y - 4.0f - (float) OyVeyGui.getClickGui().getTextOffset(), -1);
+        drawString(this.getName(), (float) this.x + 3.0f, (float) this.y - 4.0f - (float) Zoux1Gui.getClickGui().getTextOffset(), -1);
         ScissorUtil.enable(context, x, 0, x + width, mc.getWindow().getGuiScaledHeight());
 
         if (this.open) {
@@ -83,7 +82,7 @@ public class Widget
         if (mouseButton == 0 && this.isHovering(mouseX, mouseY)) {
             this.x2 = this.x - mouseX;
             this.y2 = this.y - mouseY;
-            OyVeyGui.getClickGui().getComponents().forEach(component -> {
+            Zoux1Gui.getClickGui().getComponents().forEach(component -> {
                 if (component.drag) {
                     component.drag = false;
                 }
@@ -193,6 +192,10 @@ public class Widget
     }
 
     protected void drawString(String text, double x, double y, int color) {
-        context.drawString(mc.font, text, (int) x, (int) y, color);
+        context.pose().pushPose();
+        float fontScale = 0.75f; // Smulkesnis šriftas
+        context.pose().scale(fontScale, fontScale, 1.0f);
+        context.drawString(mc.font, text, (int) (x / fontScale), (int) (y / fontScale), color, false);
+        context.pose().popPose();
     }
 }
