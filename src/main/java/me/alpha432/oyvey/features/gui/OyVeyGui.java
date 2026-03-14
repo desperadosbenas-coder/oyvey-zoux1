@@ -1,10 +1,10 @@
-package me.alpha432.oyvey.features.gui;
+package me.zoux1.features.gui;
 
-import me.alpha432.oyvey.OyVey;
-import me.alpha432.oyvey.features.Feature;
-import me.alpha432.oyvey.features.gui.items.Item;
-import me.alpha432.oyvey.features.gui.items.buttons.ModuleButton;
-import me.alpha432.oyvey.features.modules.Module;
+import me.zoux1.Zoux1;
+import me.zoux1.features.Feature;
+import me.zoux1.features.gui.items.Item;
+import me.zoux1.features.gui.items.buttons.ModuleButton;
+import me.zoux1.features.modules.Module;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -16,31 +16,31 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class OyVeyGui extends Screen {
-    private static OyVeyGui INSTANCE;
+public class Zoux1Gui extends Screen {
+    private static Zoux1Gui INSTANCE;
     private static Color colorClipboard = null;
 
     static {
-        INSTANCE = new OyVeyGui();
+        INSTANCE = new Zoux1Gui();
     }
 
     private final ArrayList<Widget> widgets = new ArrayList<>();
 
-    public OyVeyGui() {
-        super(Component.literal("OyVey"));
+    public Zoux1Gui() {
+        super(Component.literal("Zoux1"));
         setInstance();
         load();
     }
 
-    public static OyVeyGui getInstance() {
+    public static Zoux1Gui getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new OyVeyGui();
+            INSTANCE = new Zoux1Gui();
         }
         return INSTANCE;
     }
 
-    public static OyVeyGui getClickGui() {
-        return OyVeyGui.getInstance();
+    public static Zoux1Gui getClickGui() {
+        return Zoux1Gui.getInstance();
     }
 
     private void setInstance() {
@@ -49,10 +49,10 @@ public class OyVeyGui extends Screen {
 
     private void load() {
         int x = -84;
-        for (Module.Category category : OyVey.moduleManager.getCategories()) {
+        for (Module.Category category : Zoux1.moduleManager.getCategories()) {
             if (category == Module.Category.HUD) continue;
             Widget panel = new Widget(category.getName(), x += 90, 4, true);
-            OyVey.moduleManager.stream()
+            Zoux1.moduleManager.stream()
                     .filter(m -> m.getCategory() == category && !m.hidden)
                     .map(ModuleButton::new)
                     .forEach(panel::addButton);
@@ -106,9 +106,10 @@ public class OyVeyGui extends Screen {
     public boolean isPauseScreen() {
         return false;
     }
+
     @Override
     public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
-    }//ignore 1.21.8 blur thing
+    } // ignore 1.21.8 blur thing
 
     public final ArrayList<Widget> getComponents() {
         return this.widgets;
