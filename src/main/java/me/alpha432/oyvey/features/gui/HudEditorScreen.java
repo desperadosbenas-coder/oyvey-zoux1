@@ -1,10 +1,10 @@
-package me.alpha432.oyvey.features.gui;
+package me.zoux1.features.gui;
 
-import me.alpha432.oyvey.OyVey;
-import me.alpha432.oyvey.features.Feature;
-import me.alpha432.oyvey.features.gui.items.buttons.ModuleButton;
-import me.alpha432.oyvey.features.modules.Module;
-import me.alpha432.oyvey.features.modules.client.HudModule;
+import me.zoux1.Zoux1;
+import me.zoux1.features.Feature;
+import me.zoux1.features.gui.items.buttons.ModuleButton;
+import me.zoux1.features.modules.Module;
+import me.zoux1.features.modules.client.HudModule;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -23,13 +23,13 @@ public class HudEditorScreen extends Screen {
     public boolean anyHover;
 
     private HudEditorScreen() {
-        super(Component.literal("oyvey-hudeditor"));
+        super(Component.literal("zoux1-hudeditor"));
         load();
     }
 
     private void load() {
-        Widget hud = new Widget("Hud", 50, 50, true);
-        OyVey.moduleManager.stream()
+        Widget hud = new Widget("HUD", 50, 50, true);
+        Zoux1.moduleManager.stream()
                 .filter(m -> m.getCategory() == Module.Category.HUD && !m.hidden)
                 .map(ModuleButton::new)
                 .forEach(hud::addButton);
@@ -97,4 +97,3 @@ public class HudEditorScreen extends Screen {
         return INSTANCE;
     }
 }
-
