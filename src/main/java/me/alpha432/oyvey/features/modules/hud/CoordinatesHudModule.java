@@ -3,40 +3,52 @@ package me.alpha432.oyvey.features.modules.hud;
 import me.alpha432.oyvey.event.impl.render.Render2DEvent;
 import me.alpha432.oyvey.features.modules.client.HudModule;
 import me.alpha432.oyvey.features.settings.Setting;
+import net.minecraft.ChatFormatting;
 
 public class CoordinatesHudModule extends HudModule {
-    public Setting<Boolean> nether = bool("Nether", false);
+
+    public Setting<Boolean> nether    = bool("Nether", false);
+    public Setting<Boolean> showLabel = bool("Labels", true);
+    public Setting<Boolean> brackets  = bool("Brackets", true);
 
     public CoordinatesHudModule() {
-        super("Coordinates", "Display coordinates", 150, 20);
+        super("Coordinates", "Display coordinates", 160, 20);
     }
 
     @Override
     protected void render(Render2DEvent e) {
         super.render(e);
-
         if (nullCheck()) return;
 
-        String coordsStr = String.format("X: %d Y: %d Z: %d",
-                mc.player.getBlockX(),
-                mc.player.getBlockY(),
-                mc.player.getBlockZ());
+        int x = mc.player.getBlockX();
+        int y = mc.player.getBlockY();
+        int z = mc.player.getBlockZ();
+
+        String xStr = (showLabel.getValue() ? "§7x §f" : "") + x;
+        String yStr = (showLabel.getValue() ? " §7y §f" : " ") + y;
+        String zStr = (showLabel.getValue() ? " §7z §f" : " ") + z;
+
+        String coordsStr = xStr + yStr + zStr;
 
         if (nether.getValue()) {
-            int netherX = mc.player.level().dimension().identifier().getPath().equals("the_nether")
-                    ? mc.player.getBlockX() * 8
-                    : mc.player.getBlockX() / 8;
-            int netherZ = mc.player.level().dimension().identifier().getPath().equals("the_nether")
-                    ? mc.player.getBlockZ() * 8
-                    : mc.player.getBlockZ() / 8;
-            coordsStr += String.format(" [%d, %d]", netherX, netherZ);
+            boolean inNether = mc.player.level().dimension()
+                    .location().getPath().equals("the_nether");
+            int nx = inNether ? x * 8 : x / 8;
+            int nz = inNether ? z * 8 : z / 8;
+            String dim = inNether ? "§cNether §7→ §fOverworld" : "§aOverworld §7→ §cNether";
+            coordsStr += "  " + (brackets.getValue() ? "§8[" : "") + dim
+                    + (showLabel.getValue() ? " §7x §f" : " ") + nx
+                    + (showLabel.getValue() ? " §7z §f" : " ") + nz
+                    + (brackets.getValue() ? "§8]" : "");
         }
 
-        e.getContext().drawString(mc.font, coordsStr,
+        String prefix = "§b§lzoux1 §8| §r";
+        String full   = prefix + coordsStr;
+
+        e.getContext().drawString(mc.font, full,
                 (int) getX(), (int) getY(), -1);
 
-        setWidth(mc.font.width(coordsStr));
+        setWidth(mc.font.width(full));
         setHeight(mc.font.lineHeight);
     }
 }
-
