@@ -12,43 +12,48 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 public class ClickGuiModule extends Module {
+
     private static ClickGuiModule INSTANCE;
 
-    public Setting<String> prefix = str("Prefix", ".");
-    public Setting<Color> color = color("Color", 0, 0, 255, 180);
-    public Setting<Color> topColor = color("TopColor", 0, 0, 150, 240);
-    public Setting<Boolean> rainbow = bool("Rainbow", false);
-    public Setting<Integer> rainbowHue = num("Delay", 240, 0, 600);
-    public Setting<Float> rainbowBrightness = num("Brightness", 150.0f, 1.0f, 255.0f);
-    public Setting<Float> rainbowSaturation = num("Saturation", 150.0f, 1.0f, 255.0f);
+    public Setting<String>  prefix            = str("Prefix", ".");
+    public Setting<Color>   color             = color("Color",    0,   0, 255, 180);
+    public Setting<Color>   topColor          = color("TopColor", 0,   0, 150, 240);
+    public Setting<Boolean> rainbow           = bool("Rainbow", false);
+    public Setting<Integer> rainbowDelay      = num("Delay",      240,  0,   600);
+    public Setting<Float>   rainbowBrightness = num("Brightness", 150f, 1f, 255f);
+    public Setting<Float>   rainbowSaturation = num("Saturation", 150f, 1f, 255f);
+    public Setting<Boolean> blur              = bool("Blur", true);
+    public Setting<Boolean> animations        = bool("Animations", true);
 
     public ClickGuiModule() {
-        super("ClickGui", "Opens the ClickGui", Module.Category.CLIENT);
+        super("ClickGui", "Opens the zoux1 ClickGui", Module.Category.CLIENT);
         setBind(GLFW.GLFW_KEY_RIGHT_SHIFT);
-        rainbowHue.setVisibility(v -> rainbow.getValue());
+
+        rainbowDelay.setVisibility(v      -> rainbow.getValue());
         rainbowBrightness.setVisibility(v -> rainbow.getValue());
         rainbowSaturation.setVisibility(v -> rainbow.getValue());
+
         INSTANCE = this;
     }
 
     @Subscribe
     public void onSettingChange(ClientEvent event) {
-        if (event.getType() == ClientEvent.Type.SETTING_UPDATE && event.getSetting().getFeature().equals(this)) {
-            if (event.getSetting().equals(this.prefix)) {
-                OyVey.commandManager.setCommandPrefix(this.prefix.getPlannedValue());
-                Command.sendMessage("Prefix set to {global} %s", OyVey.commandManager.getCommandPrefix());
-            }
-            if (event.getSetting().equals(this.color)) {
-                OyVey.colorManager.setColor(this.color.getPlannedValue());
-            }
+        if (event.getType() != ClientEvent.Type.SETTING_UPDATE) return;
+        if (!event.getSetting().getFeature().equals(this)) return;
+
+        if (event.getSetting().equals(this.prefix)) {
+            OyVey.commandManager.setCommandPrefix(this.prefix.getPlannedValue());
+            Command.sendMessage("§b§lzoux1 §8| §7Prefix set to §f" + OyVey.commandManager.getCommandPrefix());
+        }
+
+        if (event.getSetting().equals(this.color)) {
+            OyVey.colorManager.setColor(this.color.getPlannedValue());
         }
     }
 
     @Override
     public void onEnable() {
-        if (nullCheck()) {
-            return;
-        }
+        if (nullCheck()) return;
         mc.setScreen(OyVeyGui.getClickGui());
     }
 
@@ -60,7 +65,7 @@ public class ClickGuiModule extends Module {
 
     @Override
     public void onTick() {
-        if (!(ClickGuiModule.mc.screen instanceof OyVeyGui)) {
+        if (!(mc.screen instanceof OyVeyGui)) {
             this.disable();
         }
     }
