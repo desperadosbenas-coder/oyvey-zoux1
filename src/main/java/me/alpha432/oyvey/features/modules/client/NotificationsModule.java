@@ -8,26 +8,25 @@ import me.alpha432.oyvey.util.TextUtil;
 import me.alpha432.oyvey.util.player.ChatUtil;
 
 public class NotificationsModule extends Module {
-    private static final String MODULE_FORMAT = "Toggled %s %s %s";
 
     public Setting<Boolean> moduleToggle = bool("Module Toggle", true);
+    public Setting<Boolean> showPrefix   = bool("Show Prefix",   true);
 
     public NotificationsModule() {
-        super("Notifications", "Displays notifications for various client events", Category.CLIENT);
+        super("Notifications", "Displays notifications for client events", Category.CLIENT);
     }
 
     @Subscribe
     public void onClient(ClientEvent event) {
         if (!moduleToggle.getValue()
                 || event.getType() != ClientEvent.Type.TOGGLE_MODULE
-                || event.getFeature() instanceof ClickGuiModule) {
-            return;
-        }
+                || event.getFeature() instanceof ClickGuiModule) return;
 
-        boolean moduleState = event.getFeature().isEnabled();
-        ChatUtil.sendMessage(TextUtil.text(MODULE_FORMAT,
-                event.getFeature().getName(),
-                moduleState ? "{green}" : "{red}",
-                moduleState ? "on" : "off"));
+        boolean on     = event.getFeature().isEnabled();
+        String  name   = event.getFeature().getName();
+        String  state  = on ? "§a§lon" : "§c§loff";
+        String  prefix = showPrefix.getValue() ? "§b§lzoux1 §8| §r" : "";
+
+        ChatUtil.sendMessage(prefix + name + " §8→ " + state);
     }
 }
