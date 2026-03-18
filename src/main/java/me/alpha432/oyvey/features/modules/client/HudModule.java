@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import org.joml.Vector2f;
 
 public abstract class HudModule extends Module {
+
     public final Setting<Vector2f> pos = vec2f("Position", 0.5f, 0.5f);
 
     private float dragX, dragY, width, height;
@@ -19,7 +20,7 @@ public abstract class HudModule extends Module {
 
     public HudModule(String name, String description, float width, float height) {
         super(name, description, Category.HUD);
-        this.width = width;
+        this.width  = width;
         this.height = height;
     }
 
@@ -28,12 +29,11 @@ public abstract class HudModule extends Module {
     }
 
     public float getY() {
+        float baseY        = mc.getWindow().getGuiScaledHeight() * pos.getValue().y();
         float heightWithChat = mc.getWindow().getGuiScaledHeight() - 14;
-        float baseY = mc.getWindow().getGuiScaledHeight() * pos.getValue().y();
-        float combined = baseY + getHeight();
 
         if (mc.screen instanceof ChatScreen) {
-            baseY = Math.min(combined, heightWithChat) - getHeight();
+            baseY = Math.min(baseY + getHeight(), heightWithChat) - getHeight();
         }
         return baseY;
     }
@@ -48,7 +48,7 @@ public abstract class HudModule extends Module {
         if (!(mc.screen instanceof HudEditorScreen) || nullCheck()) return;
 
         if (e.getAction() == 0) {
-            button = false;
+            button   = false;
             dragging = false;
             HudEditorScreen.getInstance().currentDragging = null;
         }
@@ -66,45 +66,51 @@ public abstract class HudModule extends Module {
 
         if (button) {
             if (!dragging && isHovering() && HudEditorScreen.getInstance().currentDragging == null) {
-                dragX = getMouseX() - x;
-                dragY = getMouseY() - y;
+                dragX    = getMouseX() - x;
+                dragY    = getMouseY() - y;
                 dragging = true;
                 HudEditorScreen.getInstance().currentDragging = this;
             }
 
             if (dragging) {
-                float finalX = Math.min(Math.max(getMouseX() - dragX, 0),
+                float fx = Math.min(Math.max(getMouseX() - dragX, 0),
                         mc.getWindow().getGuiScaledWidth() - width);
-                float finalY = Math.min(Math.max(getMouseY() - dragY, 0),
+                float fy = Math.min(Math.max(getMouseY() - dragY, 0),
                         mc.getWindow().getGuiScaledHeight() - height);
 
-                pos.getValue().x = finalX / mc.getWindow().getGuiScaledWidth();
-                pos.getValue().y = finalY / mc.getWindow().getGuiScaledHeight();
+                pos.getValue().x = fx / mc.getWindow().getGuiScaledWidth();
+                pos.getValue().y = fy / mc.getWindow().getGuiScaledHeight();
             }
         } else {
             dragging = false;
         }
 
-        boolean shouldDrawDescription = isHovering() && !HudEditorScreen.getInstance().anyHover;
+        boolean shouldDrawLabel = isHovering() && !HudEditorScreen.getInstance().anyHover;
         if (HudEditorScreen.getInstance().currentDragging != null) {
-            shouldDrawDescription = HudEditorScreen.getInstance().currentDragging == this;
+            shouldDrawLabel = HudEditorScreen.getInstance().currentDragging == this;
         }
 
-        if (shouldDrawDescription) {
-            int textWidth = mc.font.width(getName());
-            int textHeight = mc.font.lineHeight;
-            float textX = x + width + 5;
+        if (shouldDrawLabel) {
+            String label    = "§b§lzoux1 §8| §r" + getName();
+            int textWidth   = mc.font.width(label);
+            int textHeight  = mc.font.lineHeight;
+            float textX     = x + width + 5;
+
             if (textX + textWidth > mc.getWindow().getGuiScaledWidth()) {
                 textX = x - 5 - textWidth;
             }
-            e.getContext().drawString(mc.font, getName(),
+
+            e.getContext().drawString(mc.font, label,
                     (int) textX, (int) (y + height / 2f - textHeight / 2f), -1);
+
             HudEditorScreen.getInstance().anyHover = true;
         }
 
+        int accent = OyVey.colorManager.getColor().getRGB();
+
         RenderUtil.rect(e.getContext(),
                 x - 1, y - 1, x + width + 1, y + height + 1,
-                OyVey.colorManager.getColor().getRGB(), 1.0f);
+                accent, 1.0f);
     }
 
     public int getMouseX() {
@@ -116,35 +122,25 @@ public abstract class HudModule extends Module {
     }
 
     public void setBounds(float x, float y, float width, float height) {
-        this.width = width;
+        this.width  = width;
         this.height = height;
         pos.getValue().x = x / mc.getWindow().getGuiScaledWidth();
         pos.getValue().y = y / mc.getWindow().getGuiScaledHeight();
     }
 
     public boolean isHovering() {
-        float x = getX();
-        float y = getY();
-        int mouseX = getMouseX();
-        int mouseY = getMouseY();
+        float x      = getX();
+        float y      = getY();
+        int   mouseX = getMouseX();
+        int   mouseY = getMouseY();
 
         return mouseX >= x - 1 && mouseX <= x + width + 1 &&
-                mouseY >= y - 1 && mouseY <= y + height + 1;
+               mouseY >= y - 1 && mouseY <= y + height + 1;
     }
 
-    public float getWidth() {
-        return width;
-    }
+    public float getWidth()  { return width;  }
+    public float getHeight() { return height; }
 
-    public float getHeight() {
-        return height;
-    }
-
-    public void setWidth(float width) {
-        this.width = width;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
+    public void setWidth(float width)   { this.width  = width;  }
+    public void setHeight(float height) { this.height = height; }
 }
